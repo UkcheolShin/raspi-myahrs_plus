@@ -2,9 +2,9 @@
 ===================
 
 ##raspberry pi 3 i2c slave - Myahrs+
-site : http://www.withrobot.com/myahrs_plus/
+device site : http://www.withrobot.com/myahrs_plus/
 
-repository : https://github.com/withrobot/myAHRS_plus
+device repository : https://github.com/withrobot/myAHRS_plus
 
 ##Connectivity myahrs+ & raspberry pi3  
 myahrs +        //  raspberry pi3  
@@ -18,7 +18,7 @@ j4-1(VDD)        --  pin 2,4(physical)   
 j4-10(GND)       --  pin 6,9,14,20,25,30,34(physical)
   
   
-##How to implement i2c bus on raspeberry pi3
+##How to enable i2c bus on raspeberry pi3
 
 (raspberrypi) $ sudo raspi-consig
 
