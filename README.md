@@ -40,5 +40,8 @@ after reboot,
 
 (raspberrypi) $ ls /dev/i2c*
 
+>check i2c-1
+
 (raspberrypi) $ i2cdetect -y 1
-  
+
+>check 0x20
