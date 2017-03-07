@@ -20,25 +20,25 @@ repository : https://github.com/withrobot/myAHRS_plus
   
 ##How to implement i2c bus on raspeberry pi3
 
- (raspberrypi) $ sudo raspi-consig
-  
-  >enter 5.interfacing option
-  
-  >>enter 5.I2C
-    
-  >>>enable
-      
-  (raspberrypi) $ sudo echo i2c-dev >> /etc/modules
-  
-  (raspberrypi) $ reboot
-  
-  after reboot,
-  
-  (raspberrypi) $ lsmod
-  
-  >check i2c_dev
-    
-  (raspberrypi) $ ls /dev/i2c*
-  
-  (raspberrypi) $ i2cdetect -y 1
+(raspberrypi) $ sudo raspi-consig
+
+>enter 5.interfacing option
+
+>>enter 5.I2C
+
+>>>enable
+
+(raspberrypi) $ sudo echo i2c-dev >> /etc/modules
+
+(raspberrypi) $ reboot
+
+after reboot,
+
+(raspberrypi) $ lsmod
+
+>check i2c_dev
+
+(raspberrypi) $ ls /dev/i2c*
+
+(raspberrypi) $ i2cdetect -y 1
   
