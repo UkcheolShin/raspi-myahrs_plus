@@ -1,29 +1,52 @@
-
+/*
+*********************************************************************************************************
+*                                              MY_AHRS+_H
+*
+* ##raspberry pi 3 i2c slave - Myahrs+ device site : http://www.withrobot.com/myahrs_plus/
+*
+* device repository : https://github.com/withrobot/myAHRS_plus
+*
+* ##Connectivity myahrs+ & raspberry pi3   myahrs + //  raspberry pi3 
+* j3-3(I2C_SCL)         --  pin 3(Physical) 
+* j3-4(I2C_SDA)         --  pin 5(physical)   
+* j4-1(VDD)             --  pin 2,4(physical)   
+* j4-10(GND)            --  pin 6,9,14,20,25,30,34(physical)
+*
+*********************************************************************************************************
+*/
 #ifndef __MYAHRS_PLUS_H__
 #define __MYAHRS_PLUS_H__
+/*
+* 선택 옵션
+* IMU_PRINT : imu에 관련된 읽어온 정보를 프린트.
+*/
+//#define IMU_PRINT
 
-/**
+#define AHRS_SLAVE_ADDRESS      0x20
+#define AHRS_WHO_AM_I           0xB1 
+#define AHRS_STATUS_READY       0x80        // bit mask for STATUS register 
+/*
+*********************************************************************************************************
+*                                  MY_AHRS+ I2C DEFINE MACROS & VARIABLE
 * myAHRS+ I2C 인터페이스
 * myAHRS+는 I2C slave로 동작하며, I2C 버스에는 pull-up 저항이 필요하다.
 * 일반적으로 4.7k옴을 사용하며, 상황에 따라 1k옴,10k옴의 저항을 사용 가능하다.
 * 라즈베리파이의 I2C핀과 GPIO는 기본적으로 내부에 1k옴의 풀업저항을 내장하므로 
 * 라즈베리파이와 인터페이스시에는 별도의 풀업저항을 달지않아도 무방하다.
-* I2C 포트는 3.3v 전압 레벨에서 동작한다. 5V IO를 사용하는 MCU와 별도의 
-* 회로없이 바로 연결해서 사용 가능하다.
+* I2C 포트는 3.3v 전압 레벨에서 동작한다. 5V IO를 사용하는 MCU와 별도의 회로없이 바로 연결해서 사용 가능하다.
 * 기타 사양은 다음과 같다.
 * I2C Slave address : 7 bit, 0x20
 * Data bit : 8bit
 * I2C clock speed : Normal mode(100KHz), Fast mode(400KHz)
 * 이하의 레지스터는 myAHRS+의 레지스터 주소이다.
+*********************************************************************************************************
 */
-
-#define AHRS_SLAVE_ADDRESS      0x20
-
 #define REG_WHO_AM_I            0x01 // 0xB1 myAHRS+임을 의미하는 상수
 #define REG_REV_ID_MAJOR        0x02 // 펌웨어 리비전 주 번호
 #define REG_REV_ID_MINOR        0x03 // 펌웨어 리비전 부 번호
-#define REG_STATUS              0x04 //0x80 센서의 상태를 나타내며 모든 초기화 과정을 정상적으로 마치면 최상위 비트가 1이 된다. 
-/*영점 조정 파라미터로 보정하지 않은 센서 출력값(signed 16bit)을 저장한 레지스터
+#define REG_STATUS              0x04 // 0x80 센서의 상태를 나타내며 모든 초기화 과정을 정상적으로 마치면 최상위 비트가 1이 된다. 
+/*
+* 영점 조정 파라미터로 보정하지 않은 센서 출력값(signed 16bit)을 저장한 레지스터
 * low 레지스터에 하위 8bit를, high 레지스터에 상위 8bit를 저장한다.
 * 원래 정수이므로 실수로 변환할 필요 없다.
 */
@@ -45,7 +68,8 @@
 #define REG_I_MAGNET_Y_HIGH     0x1F //Magnetometer raw data
 #define REG_I_MAGNET_Z_LOW      0x20 //Magnetometer raw data
 #define REG_I_MAGNET_Z_HIGH     0x21 //Magnetometer raw data
-/*보정한 가속도 센서의 출력값(signed 16bit)을 저장한 레지스터. 
+/*
+* 보정한 가속도 센서의 출력값(signed 16bit)을 저장한 레지스터. 
 * LOW 레지스터에 하위 8bit high레지스터에 상위 8bit를 저장한다. 
 * scale factor(16/32767.0)을 곱하여 g 단위의 가속도로 변환한다.
 * 가속도(g) = C_ACC * 16 /32767.0
@@ -117,22 +141,15 @@
 #define REG_QUATERNION_W_LOW    0x42 //Quaternion 
 #define REG_QUATERNION_W_HIGH   0x43 //Quaternion 
 
-#define AHRS_WHO_AM_I                   0xB1 
-// bit mask for STATUS register 
-#define AHRS_STATUS_READY               0x80 
-
-#define STATE_CHECK 0
-#define RAW_DATA 1
-#define CAL_DATA 2
-
 /*
-* 선택 옵션
-* DEBUG : 디버그용
-* 
+*********************************************************************************************************
+*                                           DEFINE STRUCTURE TYPE
+* ahrs_sensor_t      : 9축 센서 데이터를 저장할 구조체
+* ahrs_euler_t       : 오일러 각도를 저장할 구조체
+* ahrs_quaternian_t  : 쿼터니언 각도를 저장할 구조체
+*
+*********************************************************************************************************
 */
-//#define DEBUG
-//#define PRINT
-
 typedef struct
 {
     float acc_x;
@@ -161,15 +178,17 @@ typedef struct
     float w;
 } ahrs_quaternian_t;
 
-typedef struct
-{
-    ahrs_sensor_t sensor;
-    float temp;
-    ahrs_euler_t euler;
-    ahrs_quaternian_t q;
-} ahrs_data_t;
-
-int I2C_MYAHRS_READ(int fd, unsigned char type, ahrs_data_t * ahrs_data);
-int Read(int fd, unsigned char * buf, unsigned int size, unsigned char reg);
+/*
+*********************************************************************************************************
+*                                              PREDEFINE FUNCTION
+*********************************************************************************************************
+*/
+int i2c_myahrs_setup(void);
+int i2c_myahrs_state_check(void);
+int i2c_myahrs_raw_sensor_read(ahrs_sensor_t * sensor_data);
+int i2c_myahrs_cal_sensor_read(ahrs_sensor_t * sensor_data);
+int i2c_myahrs_euler_read(ahrs_euler_t * euler_data);
+int i2c_myahrs_quat_read(ahrs_quaternian_t * quat_data);
+int i2c_read(unsigned char * buf, unsigned int size, unsigned char reg);
 
 #endif /*__MYAHRS_PLUS_H__*/
